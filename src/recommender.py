@@ -28,6 +28,9 @@ class UserProfile:
     favorite_mood: str
     target_energy: float
     likes_acoustic: bool
+    target_valence: float = 0.60
+    target_acousticness: float = 0.50
+    target_tempo_bpm: float = 100.0
 
 class Recommender:
     """
