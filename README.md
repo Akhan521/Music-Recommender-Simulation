@@ -17,17 +17,41 @@ Replace this paragraph with your own summary of what your version does.
 
 ## How The System Works
 
-Explain your design in plain language.
+Real-world recommenders like Spotify and YouTube combine two broad strategies: collaborative filtering, which finds patterns across millions of users' behaviors to suggest what similar listeners enjoyed, and content-based filtering, which analyzes the attributes of songs a user already likes to find more of the same. Production systems blend both approaches with deep learning, processing billions of implicit signals (plays, skips, listen duration) to generate candidates, rank them, and re-rank for diversity.
 
-Some prompts to answer:
+Our simulation focuses on the content-based side. Each `Song` carries six scorable features: `genre`, `mood`, `energy`, `valence`, `acousticness`, and `tempo_bpm`. A `UserProfile` stores a preferred genre, mood, target energy level, target valence, target acousticness, target tempo, and an acoustic preference flag.
 
-- What features does each `Song` use in your system
-  - For example: genre, mood, energy, tempo
-- What information does your `UserProfile` store
-- How does your `Recommender` compute a score for each song
-- How do you choose which songs to recommend
+### Algorithm Recipe
 
-You can include a simple diagram or bullet list if helpful.
+The `Recommender` scores every song on a **0 to 10 point scale** using this formula:
+
+**Categorical features** (binary match — full points or zero):
+
+| Feature | Points | Why this weight |
+|---|---|---|
+| Genre match | +3.0 | Strongest signal — defines the sonic identity (instruments, production, structure) |
+| Mood match | +2.0 | Distinguishes *when* a song fits; two lofi tracks can serve very different moments |
+
+**Numerical features** (closeness — `(1 - |user_target - song_value|) × weight`):
+
+| Feature | Max points | Why this weight |
+|---|---|---|
+| Energy | ×2.5 | Core vibe axis — the single largest feel difference between songs in the catalog |
+| Valence | ×1.0 | Emotional tone — separates brooding from bright within similar energy ranges |
+| Acousticness | ×1.0 | Production texture — acoustic coffee-shop feel vs. electronic club feel |
+| Tempo | ×0.5 | Weakest solo signal; normalized by BPM range (60–168 = 108 span) to prevent raw BPM gaps from dominating |
+
+**Score budget**: categorical features control 50% of the ceiling (5.0 pts), numerical features control the other 50% (5.0 pts). A perfect genre + mood match gets a song halfway; the numerical closeness scores decide the final ranking among categorical peers.
+
+**Ranking**: after all songs are scored, sort descending and return the top-k (default 5).
+
+### Expected Biases and Limitations
+
+- **Genre dominance**: at 3.0 points (30% of max score), genre is the heaviest single feature. A non-matching genre song needs near-perfect scores on every other dimension to compete with even a mediocre genre match. This creates a filter-bubble effect — a lofi listener will rarely see jazz recommendations even when the jazz track's energy, valence, and acousticness are a closer fit.
+- **Mood rigidity**: mood is categorical (match or miss), but real moods exist on a spectrum. "Chill" and "relaxed" feel similar to a listener, yet our system treats them as completely different, awarding zero points for a near-miss.
+- **No discovery mechanism**: the system only rewards closeness to existing preferences. It has no way to introduce variety or surprise, which real recommenders handle through exploration strategies and diversity re-ranking.
+- **Single-profile assumption**: the system models each user as having one fixed taste. Real listeners shift between moods (workout vs. sleep vs. focus), but our profile has no context awareness.
+- **Small catalog bias**: with only 20 songs and 11 genres, most genres have 1–2 representatives. A genre match filter effectively pre-selects 1–2 songs, giving the numerical features very little ranking work to do.
 
 ---
 
@@ -208,4 +232,3 @@ A few sentences about what you learned:
 - What surprised you about how your system behaved
 - How did building this change how you think about real music recommenders
 - Where do you think human judgment still matters, even if the model seems "smart"
-
