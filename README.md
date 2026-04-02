@@ -53,6 +53,16 @@ The `Recommender` scores every song on a **0 to 10 point scale** using this form
 - **Single-profile assumption**: the system models each user as having one fixed taste. Real listeners shift between moods (workout vs. sleep vs. focus), but our profile has no context awareness.
 - **Small catalog bias**: with only 20 songs and 11 genres, most genres have 1–2 representatives. A genre match filter effectively pre-selects 1–2 songs, giving the numerical features very little ranking work to do.
 
+### Sample Output
+
+Below is the terminal output from running the recommender with a lofi/chill user profile:
+
+![User profile and #1 recommendation](screenshots/screenshot_1.png)
+
+![#2 Library Rain and #3 Focus Flow](screenshots/screenshot_2.png)
+
+![#4 Spacewalk Thoughts and #5 Coffee Shop Stories](screenshots/screenshot_3.png)
+
 ---
 
 ## Getting Started
