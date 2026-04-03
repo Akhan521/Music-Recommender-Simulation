@@ -129,12 +129,10 @@ def score_song(user_prefs: Dict, song: Dict) -> Tuple[float, List[str]]:
     else:
         reasons.append(f"genre mismatch ({song['genre']} != {user_prefs['genre']}): +0.00")
 
-    # Mood match: +2.0
-    if user_prefs["mood"] == song["mood"]:
-        score += 2.0
-        reasons.append(f"mood matched ({song['mood']}): +2.00")
-    else:
-        reasons.append(f"mood mismatch ({song['mood']} != {user_prefs['mood']}): +0.00")
+    # Mood match: DISABLED for sensitivity experiment
+    # Original: +2.0 for exact match, 0 otherwise
+    # Now contributes 0 to every song — max score drops to 8.0
+    reasons.append(f"mood DISABLED ({song['mood']}): +0.00")
 
     # --- Numerical features (closeness scoring) ---
 
