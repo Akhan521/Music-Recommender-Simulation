@@ -61,29 +61,17 @@ Prompts:
 
 ## 6. Limitations and Bias 
 
-Where the system struggles or behaves unfairly. 
-
-Prompts:  
-
-- Features it does not consider  
-- Genres or moods that are underrepresented  
-- Cases where the system overfits to one preference  
-- Ways the scoring might unintentionally favor some users  
+When we temporarily disabled the mood check, Focus Flow (mood: focused) jumped from #3 to #1 for a chill lo-fi listener, overtaking Midnight Coding and Library Rain, two songs whose "chill" mood had been the only thing keeping them ahead. This reveals that mood acts less as a nuanced preference signal and more as a blunt 2-point gate: songs on the right side of the gate get a large, unearned advantage, while near-miss moods like "focused" or "relaxed" receive zero credit despite being experientially close to "chill." The flip side is equally problematic; without mood, the system loses its ability to distinguish *why* a user wants lo-fi (to relax vs. to concentrate), and rankings collapse into pure numeric proximity where Folk, Jazz, and Ambient songs compete on equal footing with no contextual anchor. In the adversarial "High Energy + Sad" profile, disabling mood caused Elegy in D Minor (classical/sad) to fall out of the top 5 entirely, replaced by Storm Runner (rock/intense), a recommendation that makes no emotional sense for a user seeking sad music. The core weakness is that mood is simultaneously too powerful when it matches (a 20% score bonus for a single binary check) and too brittle when it nearly matches (zero partial credit), creating a filter bubble around exact mood labels while ignoring the emotional spectrum between them.
 
 ---
 
 ## 7. Evaluation  
 
-How you checked whether the recommender behaved as expected. 
+We tested three user profiles: a **Chill Lo-Fi Listener** (baseline), a **High Energy + Sad Mood** edge case (conflicting preferences), and a **Nonexistent Genre & Mood** edge case (reggaeton/dreamy — labels absent from the catalog). For each profile we ran the recommender with mood scoring enabled, then re-ran with mood disabled to measure sensitivity.
 
-Prompts:  
+The baseline profile produced intuitive results — Midnight Coding and Library Rain ranked #1 and #2 with scores near 9.9/10, confirming that the system handles well-represented preferences correctly. The surprise came from the sensitivity experiment: disabling mood caused Focus Flow (mood: focused) to overtake both chill songs for #1, revealing that a +2.0 binary bonus had been masking stronger numeric alignment. In the High Energy + Sad profile, Broken Compass held #1 in both runs, but Elegy in D Minor dropped out of the top 5 entirely without its mood bonus — replaced by Storm Runner, a rock/intense track with better energy fit but no emotional relevance. The nonexistent-genre profile produced identical rankings in both runs, which confirmed our expectation: when mood already contributes zero (no catalog match), disabling it changes nothing, serving as a useful control case.
 
-- Which user profiles you tested  
-- What you looked for in the recommendations  
-- What surprised you  
-- Any simple tests or comparisons you ran  
-
-No need for numeric metrics unless you created some.
+See [reflection.md](reflection.md) for a per-profile comparison of the mood-enabled vs. mood-disabled outputs.
 
 ---
 
