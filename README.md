@@ -63,6 +63,26 @@ Below is the terminal output from running the recommender with a lofi/chill user
 
 ![#4 Spacewalk Thoughts and #5 Coffee Shop Stories](screenshots/screenshot_3.png)
 
+### Stress Testing with Diverse Profiles
+
+To probe the scoring logic for weaknesses, we ran two adversarial user profiles designed to surface unexpected behavior:
+
+**Edge Case 1 — High Energy + Sad Mood** (`energy: 0.95`, `mood: sad`, `genre: country`). This profile deliberately contradicts itself: high energy paired with a sad mood. The goal is to see whether the categorical genre/mood bonus can be "tricked" by numeric closeness or vice versa.
+
+![Edge: High Energy + Sad Mood — profile and recommendations #1–#2](screenshots/edge_high_energy_sad_mood_1.png)
+
+![Edge: High Energy + Sad Mood — recommendations #3–#5](screenshots/edge_high_energy_sad_mood_2.png)
+
+*Finding*: "Broken Compass" (country/sad, energy 0.44) wins at 8.22 despite terrible energy alignment, because the +5.0 categorical bonus dominates. Meanwhile "Rust and Roses" (metal/angry, energy 0.97) has near-perfect energy but only scores 4.15 — confirming that **genre + mood carry disproportionate weight and numeric closeness alone cannot overcome categorical mismatches**.
+
+**Edge Case 2 — Nonexistent Genre & Mood** (`genre: reggaeton`, `mood: dreamy`). Neither value exists in our 20-song catalog, so every song receives +0 for both categorical features, capping the theoretical max at 5.0.
+
+![Edge: Nonexistent Genre & Mood — profile and recommendations #1–#2](screenshots/edge_nonexistent_genre_mood_1.png)
+
+![Edge: Nonexistent Genre & Mood — recommendations #3–#5](screenshots/edge_nonexistent_genre_mood_2.png)
+
+*Finding*: All top-5 songs land in a narrow 4.29–4.62 band. R&B, country, and lofi tracks score nearly identically — the system degrades gracefully (no crashes, no negative scores) but **the recommendations feel arbitrary without categorical anchors to differentiate songs**.
+
 ---
 
 ## Getting Started
